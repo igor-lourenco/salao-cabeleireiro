@@ -18,24 +18,39 @@ public class ServicoService {
 
 	@Autowired
 	private ServicoRepository repository;
-	
+
 	@Transactional(readOnly = true)
 	public List<ServicoDTO> findAll() {
 		List<Servico> entity = repository.findAll();
 		return entity.stream().map(x -> new ServicoDTO(x)).collect(Collectors.toList());
 	}
+
 	@Transactional(readOnly = true)
 	public ServicoDTO findById(Integer id) {
 		Optional<Servico> entity = repository.findById(id);
 		Servico obj = entity.orElseThrow(() -> new ResourceNotFoundException("Servico não encontrado -> " + id));
 		return new ServicoDTO(obj);
 	}
+
 	@Transactional()
 	public ServicoDTO insert(ServicoDTO dto) {
 		Servico entity = new Servico();
 		entity.setDescricao(dto.getDescricao());
 		entity.setValor(dto.getValor());
 		entity = repository.save(entity);
+		return new ServicoDTO(entity);
+	}
+
+	@Transactional()
+	public ServicoDTO update(Integer id, ServicoDTO dto) {
+		Servico entity = repository.getOne(id);
+		try {
+			entity.setDescricao(dto.getDescricao());
+			entity.setValor(dto.getValor());
+			entity = repository.save(entity);
+		} catch (ResourceNotFoundException e) {
+			throw new ResourceNotFoundException("Serviço não foi atualizado -> " + id);
+		}
 		return new ServicoDTO(entity);
 	}
 }

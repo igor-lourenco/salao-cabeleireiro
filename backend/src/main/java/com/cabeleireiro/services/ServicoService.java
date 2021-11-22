@@ -1,6 +1,7 @@
 package com.cabeleireiro.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cabeleireiro.dto.ServicoDTO;
 import com.cabeleireiro.entities.Servico;
 import com.cabeleireiro.repositories.ServicoRepository;
+import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class ServicoService {
@@ -17,9 +19,15 @@ public class ServicoService {
 	@Autowired
 	private ServicoRepository repository;
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<ServicoDTO> findAll() {
 		List<Servico> entity = repository.findAll();
 		return entity.stream().map(x -> new ServicoDTO(x)).collect(Collectors.toList());
+	}
+	@Transactional(readOnly = true)
+	public ServicoDTO findById(Integer id) {
+		Optional<Servico> entity = repository.findById(id);
+		Servico obj = entity.orElseThrow(() -> new ResourceNotFoundException("Servico não encontrado -> " + id));
+		return new ServicoDTO(obj);
 	}
 }

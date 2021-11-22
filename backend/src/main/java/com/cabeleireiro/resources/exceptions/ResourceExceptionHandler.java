@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.cabeleireiro.services.exceptions.DatabaseException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -24,6 +25,18 @@ public class ResourceExceptionHandler {
 		err.setTimestamp(LocalDateTime.now().format(formatter));
 		err.setStatus(status.value());
 		err.setError("Recurso não encontrado");
+		err.setMessage(e.getMessage());
+		err.setPath(request.getRequestURI());
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(DatabaseException.class)
+	public ResponseEntity<StandardError> database(DatabaseException e, HttpServletRequest request){
+		HttpStatus status = HttpStatus.BAD_REQUEST; //400
+		StandardError err = new StandardError();
+		err.setTimestamp(LocalDateTime.now().format(formatter));
+		err.setStatus(status.value());
+		err.setError("Exceção no banco");
 		err.setMessage(e.getMessage());
 		err.setPath(request.getRequestURI());
 		return ResponseEntity.status(status).body(err);

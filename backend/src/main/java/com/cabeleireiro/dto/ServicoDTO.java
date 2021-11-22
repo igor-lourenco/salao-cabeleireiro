@@ -1,32 +1,30 @@
-package com.cabeleireiro.entities;
+package com.cabeleireiro.dto;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.cabeleireiro.entities.Servico;
 
-@Entity
-@Table(name = "tb_servico")
-public class Servico implements Serializable{
+public class ServicoDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+
 	private Integer id;
 	private String descricao;
 	private Double valor;
 	
-	public Servico() {
+	public ServicoDTO() {
 		
 	}
 
-	public Servico(Integer id, String descricao, Double valor) {
+	public ServicoDTO(Integer id, String descricao, Double valor) {
 		this.id = id;
 		this.descricao = descricao;
 		this.valor = valor;
+	}
+	
+	public ServicoDTO(Servico obj) {
+		this.id = obj.getId();
+		this.descricao = obj.getDescricao();
+		this.valor = obj.getValor();
 	}
 
 	public Integer getId() {
@@ -69,7 +67,7 @@ public class Servico implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Servico other = (Servico) obj;
+		ServicoDTO other = (ServicoDTO) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

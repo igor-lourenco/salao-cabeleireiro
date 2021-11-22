@@ -30,4 +30,12 @@ public class ServicoService {
 		Servico obj = entity.orElseThrow(() -> new ResourceNotFoundException("Servico não encontrado -> " + id));
 		return new ServicoDTO(obj);
 	}
+	@Transactional()
+	public ServicoDTO insert(ServicoDTO dto) {
+		Servico entity = new Servico();
+		entity.setDescricao(dto.getDescricao());
+		entity.setValor(dto.getValor());
+		entity = repository.save(entity);
+		return new ServicoDTO(entity);
+	}
 }

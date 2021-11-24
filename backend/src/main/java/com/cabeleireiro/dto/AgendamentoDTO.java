@@ -2,11 +2,8 @@ package com.cabeleireiro.dto;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.cabeleireiro.entities.Agendamento;
-import com.cabeleireiro.entities.ItemPedido;
 import com.cabeleireiro.entities.enums.HorarioEnum;
 
 public class AgendamentoDTO implements Serializable {
@@ -16,36 +13,24 @@ public class AgendamentoDTO implements Serializable {
 	private LocalDate data;
 	private HorarioEnum horario;
 
-	private Set<ItemPedido> itens = new HashSet<>();
+	private ServicoDTO servicoDTO;
 
 	public AgendamentoDTO() {
 
 	}
 
-	public AgendamentoDTO(Integer id, LocalDate data, HorarioEnum horario) {
+	public AgendamentoDTO(Integer id, LocalDate data, HorarioEnum horario, ServicoDTO servicoDTO) {
 		this.id = id;
 		this.data = data;
 		this.horario = horario;
+		this.servicoDTO = servicoDTO;
 	}
 
 	public AgendamentoDTO(Agendamento obj) {
 		this.id = obj.getId();
 		this.data = obj.getData();
 		this.horario = obj.getHorario();
-	}
-
-	public AgendamentoDTO(Agendamento obj, Set<ItemPedido> itens) {
-		this(obj);
-		itens.forEach(item -> this.itens.add(item));
-	}
-
-	public Double getValorTotal() {
-		double soma = 0.0;
-		for (ItemPedido ip : itens) {
-			soma = soma + ip.getSubTotal();
-		}
-
-		return soma;
+		this.servicoDTO = new ServicoDTO(obj.getServico());
 	}
 
 	public Integer getId() {
@@ -64,7 +49,10 @@ public class AgendamentoDTO implements Serializable {
 		this.data = data;
 	}
 
-	public String getHorario() {
+	public HorarioEnum getHorario() {
+		return horario;
+	}
+	public String getHora() {
 		return horario.getHora();
 	}
 
@@ -72,7 +60,11 @@ public class AgendamentoDTO implements Serializable {
 		this.horario = horario;
 	}
 
-	public Set<ItemPedido> getItens() {
-		return itens;
+	public ServicoDTO getServicoDTO() {
+		return servicoDTO;
+	}
+
+	public void setServicoDTO(ServicoDTO servicoDTO) {
+		this.servicoDTO = servicoDTO;
 	}
 }

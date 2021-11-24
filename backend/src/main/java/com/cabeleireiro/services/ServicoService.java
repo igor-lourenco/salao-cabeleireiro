@@ -10,8 +10,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cabeleireiro.dto.AgendamentoDTO;
 import com.cabeleireiro.dto.ServicoDTO;
+import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.Servico;
+import com.cabeleireiro.repositories.AgendamentoRepository;
 import com.cabeleireiro.repositories.ServicoRepository;
 import com.cabeleireiro.services.exceptions.DatabaseException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
@@ -21,6 +24,8 @@ public class ServicoService {
 
 	@Autowired
 	private ServicoRepository repository;
+	@Autowired
+	private AgendamentoRepository agendaRepository;
 
 	@Transactional(readOnly = true)
 	public List<ServicoDTO> findAll() {
@@ -40,6 +45,12 @@ public class ServicoService {
 		Servico entity = new Servico();
 		entity.setDescricao(dto.getDescricao());
 		entity.setValor(dto.getValor());
+		
+		for (AgendamentoDTO agendaDTO : dto.getAgendamentoDTO()) {
+			Agendamento agenda = agendaRepository.getOne(agendaDTO.getId());
+			entity.getAgendamento().add(agenda);
+		}
+		
 		entity = repository.save(entity);
 		return new ServicoDTO(entity);
 	}

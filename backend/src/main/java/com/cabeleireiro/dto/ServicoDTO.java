@@ -1,7 +1,10 @@
 package com.cabeleireiro.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.Servico;
 
 public class ServicoDTO implements Serializable{
@@ -10,6 +13,8 @@ public class ServicoDTO implements Serializable{
 	private Integer id;
 	private String descricao;
 	private Double valor;
+	
+	private List<AgendamentoDTO> agendamentoDTO = new ArrayList<>();
 	
 	public ServicoDTO() {
 		
@@ -25,6 +30,11 @@ public class ServicoDTO implements Serializable{
 		this.id = obj.getId();
 		this.descricao = obj.getDescricao();
 		this.valor = obj.getValor();
+	}
+	
+	public ServicoDTO(Servico obj, List<Agendamento> agendamento) {
+		this(obj);
+		agendamento.forEach(agenda -> this.agendamentoDTO.add(new AgendamentoDTO(agenda)));
 	}
 
 	public Integer getId() {
@@ -49,6 +59,10 @@ public class ServicoDTO implements Serializable{
 
 	public void setValor(Double valor) {
 		this.valor = valor;
+	}
+	
+	public List<AgendamentoDTO> getAgendamentoDTO() {
+		return agendamentoDTO;
 	}
 
 	@Override

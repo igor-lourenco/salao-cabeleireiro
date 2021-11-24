@@ -2,9 +2,7 @@ package com.cabeleireiro.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,8 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "tb_servico")
@@ -26,9 +22,8 @@ public class Servico implements Serializable{
 	private String descricao;
 	private Double valor;
 	
-	@JsonIgnore
-	@OneToMany(mappedBy = "id.servico")
-	private Set<ItemPedido> itens = new HashSet<>();
+	@OneToMany(mappedBy = "servico")
+	private List<Agendamento> agendamento = new ArrayList<>();
 	
 	public Servico() {
 		
@@ -40,15 +35,6 @@ public class Servico implements Serializable{
 		this.valor = valor;
 	}
 	
-	@JsonIgnore
-	public List<Agendamento> getAgendamento(){ //metodo para listar os pedidos  associados com o produto
-		List<Agendamento> lista = new ArrayList<>();
-		for(ItemPedido itemPedido : itens) {
-			lista.add(itemPedido.getAgendamento());
-		}
-		return lista;
-	}
-
 	public Integer getId() {
 		return id;
 	}
@@ -73,8 +59,8 @@ public class Servico implements Serializable{
 		this.valor = valor;
 	}
 	
-	public Set<ItemPedido> getItens() {
-		return itens;
+	public List<Agendamento> getAgendamento() {
+		return agendamento;
 	}
 
 	@Override

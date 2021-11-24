@@ -2,14 +2,13 @@ package com.cabeleireiro.entities;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.cabeleireiro.entities.enums.HorarioEnum;
@@ -29,28 +28,21 @@ public class Agendamento implements Serializable{
 	
 	private HorarioEnum horario;
 	
-	@OneToMany(mappedBy = "id.agendamento")
-	private Set<ItemPedido> itens = new HashSet<>();
+	@ManyToOne
+	@JoinColumn(name = "servico_id")
+	private Servico servico;
 	
 	public Agendamento() {
 		
 	}
 	
-	public Agendamento(Integer id, LocalDate data, HorarioEnum horario) {
+	public Agendamento(Integer id, LocalDate data, HorarioEnum horario, Servico servico) {
 		this.id = id;
 		this.data = data;
 		this.horario = horario;
+		this.servico = servico;
 	}
 	
-	public Double getValorTotal() {
-		double soma = 0.0;
-		for (ItemPedido ip : itens) {
-			soma = soma + ip.getSubTotal();
-		}
-		
-		return soma;
-	}
-
 	public Integer getId() {
 		return id;
 	}
@@ -74,9 +66,13 @@ public class Agendamento implements Serializable{
 	public void setHorario(HorarioEnum horario) {
 		this.horario = horario;
 	}
+	
+	public Servico getServico() {
+		return servico;
+	}
 
-	public Set<ItemPedido> getItens() {
-		return itens;
+	public void setServico(Servico servico) {
+		this.servico = servico;
 	}
 
 	@Override

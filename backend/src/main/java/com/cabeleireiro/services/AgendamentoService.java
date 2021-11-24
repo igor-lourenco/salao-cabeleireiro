@@ -12,10 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cabeleireiro.dto.AgendamentoDTO;
 import com.cabeleireiro.entities.Agendamento;
-import com.cabeleireiro.entities.ItemPedido;
-import com.cabeleireiro.entities.enums.HorarioEnum;
 import com.cabeleireiro.repositories.AgendamentoRepository;
-import com.cabeleireiro.repositories.ItemPedidoRepository;
 import com.cabeleireiro.repositories.ServicoRepository;
 import com.cabeleireiro.services.exceptions.DatabaseException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
@@ -27,38 +24,30 @@ public class AgendamentoService {
 	private AgendamentoRepository repository;
 	@Autowired
 	private ServicoRepository servicoRepository;
-	
-	@Autowired
-	private ItemPedidoRepository itemRepository;
+
 	
 
 	@Transactional(readOnly = true)
 	public List<AgendamentoDTO> findAll() {
 		List<Agendamento> entity = repository.findAll();
-		return entity.stream().map(x -> new AgendamentoDTO(x, x.getItens())).collect(Collectors.toList());
+		return entity.stream().map(x -> new AgendamentoDTO(x)).collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
 	public AgendamentoDTO findById(Integer id) {
 		Optional<Agendamento> entity = repository.findById(id);
 		Agendamento obj = entity.orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado -> " + id));
-		return new AgendamentoDTO(obj, obj.getItens());
+		return new AgendamentoDTO(obj);
 	}
 
 	@Transactional()
 	public AgendamentoDTO insert(AgendamentoDTO dto) {
 		Agendamento entity = new Agendamento();
-		
-		entity.setHorario(HorarioEnum.valueOf(dto.getHorario()));
+		entity.setId(10);
+		entity.setHorario(dto.getHorario());
 		entity.setData(dto.getData());
+		entity.setServico(servicoRepository.getOne(dto.getServicoDTO().getId()));
 		entity = repository.save(entity);
-		
-		for (ItemPedido ip : entity.getItens()) {
-			ip.setServico(servicoRepository.getOne(ip.getServico().getId()));
-			ip.setPreco(ip.getServico().getValor());
-			ip.setPedido(entity);
-		}
-		itemRepository.saveAll(entity.getItens());	
 		return new AgendamentoDTO(entity);
 	}
 /*

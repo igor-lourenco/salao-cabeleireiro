@@ -1,9 +1,8 @@
 package com.cabeleireiro.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -13,40 +12,43 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.cabeleireiro.entities.enums.HorarioEnum;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
-@Table(name = "tb_servico")
-public class Servico implements Serializable{
+@Table(name = "tb_agendamento")
+public class Agendamento implements Serializable{
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private String descricao;
-	private Double valor;
 	
-	@JsonIgnore
-	@OneToMany(mappedBy = "id.servico")
+	@JsonFormat(pattern="dd/MM/yyyy")
+	private LocalDate data;
+	
+	private HorarioEnum horario;
+	
+	@OneToMany(mappedBy = "id.agendamento")
 	private Set<ItemPedido> itens = new HashSet<>();
 	
-	public Servico() {
+	public Agendamento() {
 		
 	}
-
-	public Servico(Integer id, String descricao, Double valor) {
+	
+	public Agendamento(Integer id, LocalDate data, HorarioEnum horario) {
 		this.id = id;
-		this.descricao = descricao;
-		this.valor = valor;
+		this.data = data;
+		this.horario = horario;
 	}
 	
-	@JsonIgnore
-	public List<Agendamento> getAgendamento(){ //metodo para listar os pedidos  associados com o produto
-		List<Agendamento> lista = new ArrayList<>();
-		for(ItemPedido itemPedido : itens) {
-			lista.add(itemPedido.getAgendamento());
+	public Double getValorTotal() {
+		double soma = 0.0;
+		for (ItemPedido ip : itens) {
+			soma = soma + ip.getSubTotal();
 		}
-		return lista;
+		
+		return soma;
 	}
 
 	public Integer getId() {
@@ -57,22 +59,22 @@ public class Servico implements Serializable{
 		this.id = id;
 	}
 
-	public String getDescricao() {
-		return descricao;
+	public LocalDate getData() {
+		return data;
 	}
 
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
+	public void setData(LocalDate data) {
+		this.data = data;
 	}
 
-	public Double getValor() {
-		return valor;
+	public HorarioEnum getHorario() {
+		return horario;
 	}
 
-	public void setValor(Double valor) {
-		this.valor = valor;
+	public void setHorario(HorarioEnum horario) {
+		this.horario = horario;
 	}
-	
+
 	public Set<ItemPedido> getItens() {
 		return itens;
 	}
@@ -93,7 +95,7 @@ public class Servico implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Servico other = (Servico) obj;
+		Agendamento other = (Agendamento) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

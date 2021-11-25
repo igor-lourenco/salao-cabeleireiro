@@ -43,27 +43,28 @@ public class AgendamentoService {
 	@Transactional()
 	public AgendamentoDTO insert(AgendamentoDTO dto) {
 		Agendamento entity = new Agendamento();
-		entity.setId(10);
 		entity.setHorario(dto.getHorario());
 		entity.setData(dto.getData());
 		entity.setServico(servicoRepository.getOne(dto.getServicoDTO().getId()));
 		entity = repository.save(entity);
 		return new AgendamentoDTO(entity);
 	}
-/*
+
 	@Transactional()
 	public AgendamentoDTO update(Integer id, AgendamentoDTO dto) {
 		Agendamento entity = repository.getOne(id);
 		try {
-			entity.setDescricao(dto.getDescricao());
-			entity.setValor(dto.getValor());
+			entity.setHorario(dto.getHorario());
+			entity.setData(dto.getData());
+			entity.setServico(servicoRepository.getOne(dto.getServicoDTO().getId()));
 			entity = repository.save(entity);
 		} catch (ResourceNotFoundException e) {
-			throw new ResourceNotFoundException("Serviço não foi atualizado -> " + id);
+			throw new ResourceNotFoundException("Agendamento não foi atualizado -> " + id);
 		}
 		return new AgendamentoDTO(entity);
 	}
-	*/
+	
+	
 	public void delete(Integer id) {
 		try {
 			repository.deleteById(id);			

@@ -11,8 +11,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.cabeleireiro.entities.enums.HorarioEnum;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "tb_agendamento")
@@ -23,7 +24,7 @@ public class Agendamento implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@JsonFormat(pattern="dd/MM/yyyy")
+	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private LocalDate data;
 	
 	private HorarioEnum horario;

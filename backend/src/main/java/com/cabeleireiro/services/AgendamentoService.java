@@ -70,7 +70,7 @@ public class AgendamentoService {
 		try {
 			repository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
-			throw new ResourceNotFoundException("Id não encontrado -> " + id);
+			throw new ResourceNotFoundException("Agendamento não encontrado -> " + id);
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Violação de integridade no banco");
 		}

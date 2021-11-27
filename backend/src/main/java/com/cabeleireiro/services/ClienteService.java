@@ -55,7 +55,7 @@ public class ClienteService {
 			atualizaCliente(entity, dto);
 			entity = repository.save(entity);
 		} catch (ResourceNotFoundException e) {
-			throw new ResourceNotFoundException("Serviço não foi atualizado -> " + id);
+			throw new ResourceNotFoundException("Cliente não foi atualizado -> " + id);
 		}
 		return new ClienteDTO(entity);
 	}
@@ -64,7 +64,7 @@ public class ClienteService {
 		try {
 			repository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
-			throw new ResourceNotFoundException("Id não encontrado -> " + id);
+			throw new ResourceNotFoundException("Cliente não encontrado -> " + id);
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Violação de integridade no banco");
 		}

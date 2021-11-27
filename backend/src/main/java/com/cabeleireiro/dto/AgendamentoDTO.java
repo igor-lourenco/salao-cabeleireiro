@@ -14,16 +14,18 @@ public class AgendamentoDTO implements Serializable {
 	private HorarioEnum horario;
 
 	private ServicoDTO servicoDTO;
+	private ClienteDTO clienteDTO;
 
 	public AgendamentoDTO() {
 
 	}
 
-	public AgendamentoDTO(Integer id, LocalDate data, HorarioEnum horario, ServicoDTO servicoDTO) {
+	public AgendamentoDTO(Integer id, LocalDate data, HorarioEnum horario, ServicoDTO servicoDTO, ClienteDTO clienteDTO) {
 		this.id = id;
 		this.data = data;
 		this.horario = horario;
 		this.servicoDTO = servicoDTO;
+		this.clienteDTO = clienteDTO;
 	}
 
 	public AgendamentoDTO(Agendamento obj) {
@@ -31,6 +33,7 @@ public class AgendamentoDTO implements Serializable {
 		this.data = obj.getData();
 		this.horario = obj.getHorario();
 		this.servicoDTO = new ServicoDTO(obj.getServico());
+		this.clienteDTO = new ClienteDTO(obj.getCliente());
 	}
 
 	public Integer getId() {
@@ -66,5 +69,13 @@ public class AgendamentoDTO implements Serializable {
 
 	public void setServicoDTO(ServicoDTO servicoDTO) {
 		this.servicoDTO = servicoDTO;
+	}
+
+	public ClienteDTO getClienteDTO() {
+		return clienteDTO;
+	}
+
+	public void setClienteDTO(ClienteDTO clienteDTO) {
+		this.clienteDTO = clienteDTO;
 	}
 }

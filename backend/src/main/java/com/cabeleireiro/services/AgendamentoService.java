@@ -16,6 +16,7 @@ import com.cabeleireiro.dto.AgendamentoDTO;
 import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.enums.HorarioEnum;
 import com.cabeleireiro.repositories.AgendamentoRepository;
+import com.cabeleireiro.repositories.ClienteRepository;
 import com.cabeleireiro.repositories.ServicoRepository;
 import com.cabeleireiro.services.exceptions.DatabaseException;
 import com.cabeleireiro.services.exceptions.ReservaNotFoundException;
@@ -28,6 +29,8 @@ public class AgendamentoService {
 	private AgendamentoRepository repository;
 	@Autowired
 	private ServicoRepository servicoRepository;
+	@Autowired
+	private ClienteRepository clienteRepository;
 
 	@Transactional(readOnly = true)
 	public List<AgendamentoDTO> findAll() {
@@ -38,61 +41,65 @@ public class AgendamentoService {
 	@Transactional(readOnly = true)
 	public AgendamentoDTO findById(Integer id) {
 		Optional<Agendamento> entity = repository.findById(id);
-		Agendamento obj = entity.orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado -> " + id));
+		Agendamento obj = entity
+				.orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado -> " + id));
 		return new AgendamentoDTO(obj);
 	}
 
 	@Transactional()
 	public AgendamentoDTO insert(AgendamentoDTO dto) {
 		Agendamento entity = new Agendamento();
-		entity.setHorario(dto.getHorario());
-		verificaHorario(dto);	 // verifica se já existe um horário reservado
-		entity.setData(dto.getData());
-		entity.setServico(servicoRepository.getOne(dto.getServicoDTO().getId()));
+		atualizaAgendamento(entity, dto);
 		entity = repository.save(entity);
 		return new AgendamentoDTO(entity);
 	}
-	
+
 	@Transactional()
 	public AgendamentoDTO update(Integer id, AgendamentoDTO dto) {
-		Agendamento entity = repository.getOne(id);
 		try {
-			entity.setHorario(dto.getHorario());
-			verificaHorario(dto);        // verifica se já existe um horário reservado
-			entity.setData(dto.getData());
-			entity.setServico(servicoRepository.getOne(dto.getServicoDTO().getId()));
+			Agendamento entity = repository.getOne(id);
+			atualizaAgendamento(entity, dto);
 			entity = repository.save(entity);
+			return new AgendamentoDTO(entity);
 		} catch (ResourceNotFoundException e) {
 			throw new ResourceNotFoundException("Agendamento não foi atualizado -> " + id);
 		}
-		return new AgendamentoDTO(entity);
 	}
-	
+
 	public void delete(Integer id) {
 		try {
-			repository.deleteById(id);			
-		}catch(EmptyResultDataAccessException e) {
+			repository.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
 			throw new ResourceNotFoundException("Id não encontrado -> " + id);
-		}catch(DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Violação de integridade no banco");
 		}
 	}
-	
-	public List<AgendamentoDTO> findByData(LocalDate data){
+
+	public List<AgendamentoDTO> findByData(LocalDate data) {
 		List<Agendamento> agenda = repository.findByData(data);
 		return agenda.stream().map(x -> new AgendamentoDTO(x)).collect(Collectors.toList());
 	}
-	
+
+	public void atualizaAgendamento(Agendamento entity, AgendamentoDTO dto) {
+		entity.setHorario(dto.getHorario());
+		verificaHorario(dto); // verifica se já existe um horário reservado
+		entity.setData(dto.getData());
+		entity.setServico(servicoRepository.getOne(dto.getServicoDTO().getId()));
+		entity.setCliente(clienteRepository.getOne(dto.getServicoDTO().getId()));
+
+	}
+
 	public void verificaHorario(AgendamentoDTO dto) {
 		List<Agendamento> agenda = repository.findAll();
-		
+
 		for (Agendamento obj : agenda) {
 			LocalDate localDate1 = obj.getData();
 			LocalDate localDate2 = dto.getData();
 			HorarioEnum horarioEnum1 = obj.getHorario();
 			HorarioEnum horarioEnum2 = dto.getHorario();
-			
-			if(localDate1.equals(localDate2) && horarioEnum1.equals(horarioEnum2)) {
+
+			if (localDate1.equals(localDate2) && horarioEnum1.equals(horarioEnum2)) {
 				throw new ReservaNotFoundException("Esse horário já está reservado: " + horarioEnum2.getHora());
 			}
 		}

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.cabeleireiro.services.exceptions.DatabaseException;
+import com.cabeleireiro.services.exceptions.ReservaNotFoundException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -25,6 +26,17 @@ public class ResourceExceptionHandler {
 		err.setTimestamp(LocalDateTime.now().format(formatter));
 		err.setStatus(status.value());
 		err.setError("Recurso não encontrado");
+		err.setMessage(e.getMessage());
+		err.setPath(request.getRequestURI());
+		return ResponseEntity.status(status).body(err);
+	}
+	@ExceptionHandler(ReservaNotFoundException.class)
+	public ResponseEntity<StandardError> reservaNotFound(ReservaNotFoundException e, HttpServletRequest request){
+		HttpStatus status = HttpStatus.NOT_FOUND; // 404
+		StandardError err = new StandardError();
+		err.setTimestamp(LocalDateTime.now().format(formatter));
+		err.setStatus(status.value());
+		err.setError("Erro na atualização");
 		err.setMessage(e.getMessage());
 		err.setPath(request.getRequestURI());
 		return ResponseEntity.status(status).body(err);

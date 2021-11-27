@@ -11,8 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import com.cabeleireiro.entities.enums.HorarioEnum;
 
 @Entity
@@ -24,7 +22,7 @@ public class Agendamento implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@DateTimeFormat(pattern = "yyyy/MM/dd")
+	
 	private LocalDate data;
 	
 	private HorarioEnum horario;
@@ -33,15 +31,20 @@ public class Agendamento implements Serializable{
 	@JoinColumn(name = "servico_id")
 	private Servico servico;
 	
+	@ManyToOne
+	@JoinColumn(name = "cliente_id")
+	private Cliente cliente;
+	
 	public Agendamento() {
 		
 	}
 	
-	public Agendamento(Integer id, LocalDate data, HorarioEnum horario, Servico servico) {
+	public Agendamento(Integer id, LocalDate data, HorarioEnum horario, Servico servico, Cliente cliente) {
 		this.id = id;
 		this.data = data;
 		this.horario = horario;
 		this.servico = servico;
+		this.cliente= cliente;
 	}
 	
 	public Integer getId() {
@@ -74,6 +77,14 @@ public class Agendamento implements Serializable{
 
 	public void setServico(Servico servico) {
 		this.servico = servico;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import com.cabeleireiro.entities.enums.HorarioEnum;
 import com.cabeleireiro.repositories.AgendamentoRepository;
 import com.cabeleireiro.repositories.ServicoRepository;
 import com.cabeleireiro.services.exceptions.DatabaseException;
+import com.cabeleireiro.services.exceptions.ReservaNotFoundException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
 
 @Service
@@ -29,7 +31,7 @@ public class AgendamentoService {
 
 	@Transactional(readOnly = true)
 	public List<AgendamentoDTO> findAll() {
-		List<Agendamento> entity = repository.findAll();
+		List<Agendamento> entity = repository.findAll(Sort.by("data").descending());
 		return entity.stream().map(x -> new AgendamentoDTO(x)).collect(Collectors.toList());
 	}
 
@@ -56,6 +58,7 @@ public class AgendamentoService {
 		Agendamento entity = repository.getOne(id);
 		try {
 			entity.setHorario(dto.getHorario());
+			verificaHorario(dto);        // verifica se já existe um horário reservado
 			entity.setData(dto.getData());
 			entity.setServico(servicoRepository.getOne(dto.getServicoDTO().getId()));
 			entity = repository.save(entity);
@@ -64,7 +67,6 @@ public class AgendamentoService {
 		}
 		return new AgendamentoDTO(entity);
 	}
-	
 	
 	public void delete(Integer id) {
 		try {
@@ -91,8 +93,7 @@ public class AgendamentoService {
 			HorarioEnum horarioEnum2 = dto.getHorario();
 			
 			if(localDate1.equals(localDate2) && horarioEnum1.equals(horarioEnum2)) {
-				System.out.println(" -> True\n");
-				throw new ResourceNotFoundException("Esse horário já está reservado " + horarioEnum2);
+				throw new ReservaNotFoundException("Esse horário já está reservado: " + horarioEnum2.getHora());
 			}
 		}
 	}

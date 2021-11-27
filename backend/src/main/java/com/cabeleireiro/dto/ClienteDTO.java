@@ -15,7 +15,7 @@ public class ClienteDTO implements Serializable{
 	private String email;
 	private String senha;
 	
-	private List<AgendamentoDTO> agendamentosDTO = new ArrayList<>();
+	private List<AgendamentoFindDTO> agendamentosDTO = new ArrayList<>();
 	
 	public ClienteDTO() {
 		
@@ -35,7 +35,7 @@ public class ClienteDTO implements Serializable{
 	}
 	public ClienteDTO(Cliente obj, List<Agendamento> agendamentos) {
 		this(obj);
-		agendamentos.forEach(agenda -> this.agendamentosDTO.add(new AgendamentoDTO(agenda)));
+		agendamentos.forEach(agenda -> this.agendamentosDTO.add(new AgendamentoFindDTO(agenda)));
 	}
 
 	public Integer getId() {
@@ -70,7 +70,7 @@ public class ClienteDTO implements Serializable{
 		this.senha = senha;
 	}
 
-	public List<AgendamentoDTO> getAgendamentosDTO() {
+	public List<AgendamentoFindDTO> getAgendamentosDTO() {
 		return agendamentosDTO;
 	}
 

@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -51,6 +53,23 @@ public class ResourceExceptionHandler {
 		err.setError("Exceção no banco");
 		err.setMessage(e.getMessage());
 		err.setPath(request.getRequestURI());
+		return ResponseEntity.status(status).body(err);
+	}
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ValidationError> validacao(MethodArgumentNotValidException e, HttpServletRequest request){
+		HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY; //422 -> serve para validação de formulários
+		ValidationError err = new ValidationError();
+		err.setTimestamp(LocalDateTime.now().format(formatter));
+		err.setStatus(status.value());
+		err.setError("Exceção na validação");
+		err.setMessage(String.valueOf(e.getFieldError()));
+		err.setPath(request.getRequestURI());
+		
+		// pra pegar a lista de erros da validação
+		for(FieldError errors : e.getBindingResult().getFieldErrors()) { 
+			err.addError(errors.getField(), errors.getDefaultMessage());
+		}
+
 		return ResponseEntity.status(status).body(err);
 	}
 }

@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,13 +27,15 @@ public class Cliente implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String nome;
+	
+	@Column(unique = true)
 	private String email;
 	private String senha;
 
 	@OneToMany(mappedBy = "cliente")
 	private List<Agendamento> agendamentos = new ArrayList<>();
 	
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER) // pra forca a busca dos roles junto com o usuario
 	@JoinTable(name = "tb_cliente_role",
 	joinColumns = @JoinColumn(name = "cliente_id"),
 	inverseJoinColumns = @JoinColumn(name = "role_id")

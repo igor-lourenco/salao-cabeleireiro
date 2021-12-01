@@ -7,15 +7,20 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cabeleireiro.dto.AgendamentoFindDTO;
 import com.cabeleireiro.dto.ClienteDTO;
+import com.cabeleireiro.dto.ClienteInsertDTO;
+import com.cabeleireiro.dto.RoleDTO;
 import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.Cliente;
+import com.cabeleireiro.entities.Role;
 import com.cabeleireiro.repositories.AgendamentoRepository;
 import com.cabeleireiro.repositories.ClienteRepository;
+import com.cabeleireiro.repositories.RoleRepository;
 import com.cabeleireiro.services.exceptions.DatabaseException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
 
@@ -26,6 +31,10 @@ public class ClienteService {
 	private ClienteRepository repository;
 	@Autowired
 	private AgendamentoRepository agendaRepository;
+	@Autowired
+	private RoleRepository roleRepository;
+	@Autowired
+	private BCryptPasswordEncoder senhaEncoder;
 
 	@Transactional(readOnly = true)
 	public List<ClienteDTO> findAll() {
@@ -41,9 +50,10 @@ public class ClienteService {
 	}
 
 	@Transactional()
-	public ClienteDTO insert(ClienteDTO dto) {
+	public ClienteDTO insert(ClienteInsertDTO dto) {
 		Cliente entity = new Cliente();
 		atualizaCliente(entity, dto);
+		entity.setSenha(senhaEncoder.encode(dto.getSenha()));
 		entity = repository.save(entity);
 		return new ClienteDTO(entity);
 	}
@@ -73,8 +83,14 @@ public class ClienteService {
 	public void atualizaCliente(Cliente entity, ClienteDTO dto) {
 		entity.setNome(dto.getNome());
 		entity.setEmail(dto.getEmail());
-		entity.setSenha(dto.getSenha());
 
+		entity.getRoles().clear();
+		for (RoleDTO roleDTO : dto.getRolesDTO()) {
+			Role role = roleRepository.getOne(roleDTO.getId());
+			entity.getRoles().add(role);
+		}
+		
+		entity.getAgendamentos().clear();
 		for (AgendamentoFindDTO agendaDTO : dto.getAgendamentosDTO()) {
 			Agendamento agenda = agendaRepository.getOne(agendaDTO.getId());
 			entity.getAgendamentos().add(agenda);

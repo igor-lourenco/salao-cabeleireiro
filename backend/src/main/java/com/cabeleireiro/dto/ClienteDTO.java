@@ -2,7 +2,9 @@ package com.cabeleireiro.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.Cliente;
@@ -13,25 +15,25 @@ public class ClienteDTO implements Serializable{
 	private Integer id;
 	private String nome;
 	private String email;
-	private String senha;
 	
 	private List<AgendamentoFindDTO> agendamentosDTO = new ArrayList<>();
+	
+	private Set<RoleDTO> rolesDTO = new HashSet<>();
 	
 	public ClienteDTO() {
 		
 	}
 
-	public ClienteDTO(Integer id, String nome, String email, String senha) {
+	public ClienteDTO(Integer id, String nome, String email) {
 		this.id = id;
 		this.nome = nome;
 		this.email = email;
-		this.senha = senha;
 	}
 	public ClienteDTO(Cliente obj) {
-		this.id = obj.getId();
-		this.nome = obj.getNome();
-		this.email = obj.getEmail();
-		this.senha = obj.getSenha();
+		id = obj.getId();
+		nome = obj.getNome();
+		email = obj.getEmail();
+		obj.getRoles().forEach(role -> rolesDTO.add(new RoleDTO(role)));
 	}
 	public ClienteDTO(Cliente obj, List<Agendamento> agendamentos) {
 		this(obj);
@@ -62,16 +64,11 @@ public class ClienteDTO implements Serializable{
 		this.email = email;
 	}
 
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
-	}
-
 	public List<AgendamentoFindDTO> getAgendamentosDTO() {
 		return agendamentosDTO;
 	}
 
+	public Set<RoleDTO> getRolesDTO() {
+		return rolesDTO;
+	}
 }

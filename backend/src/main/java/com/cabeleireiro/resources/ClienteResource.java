@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.cabeleireiro.dto.ClienteDTO;
+import com.cabeleireiro.dto.ClienteInsertDTO;
 import com.cabeleireiro.services.ClienteService;
 
 @RestController
@@ -36,7 +37,7 @@ public class ClienteResource {
 		return ResponseEntity.ok().body(obj);
 	}
 	@PostMapping()
-	public ResponseEntity<ClienteDTO> insert(@RequestBody ClienteDTO dto){
+	public ResponseEntity<ClienteDTO> insert(@RequestBody ClienteInsertDTO dto){
 		ClienteDTO obj = service.insert(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(obj);

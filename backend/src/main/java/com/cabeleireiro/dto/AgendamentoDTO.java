@@ -3,6 +3,9 @@ package com.cabeleireiro.dto;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
+
 import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.enums.HorarioEnum;
 
@@ -10,7 +13,11 @@ public class AgendamentoDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Integer id;
+	
+	@FutureOrPresent(message = "A data não pode ser passada")
 	private LocalDate data;
+	
+	@NotNull(message = "Horário obrigatório")
 	private HorarioEnum horario;
 
 	private ServicoDTO servicoDTO;

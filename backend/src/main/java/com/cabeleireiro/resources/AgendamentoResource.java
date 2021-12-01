@@ -4,6 +4,8 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -47,14 +49,14 @@ public class AgendamentoResource {
 		return ResponseEntity.ok().body(obj);
 	}
 	@PostMapping()
-	public ResponseEntity<AgendamentoDTO> insert(@RequestBody AgendamentoDTO dto){
+	public ResponseEntity<AgendamentoDTO> insert(@Valid @RequestBody AgendamentoDTO dto){
 		AgendamentoDTO obj = service.insert(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(obj);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<AgendamentoDTO> update(@PathVariable Integer id, @RequestBody AgendamentoDTO dto){
+	public ResponseEntity<AgendamentoDTO> update(@Valid @PathVariable Integer id, @RequestBody AgendamentoDTO dto){
 		AgendamentoDTO obj = service.update(id,dto);
 		return ResponseEntity.ok().body(obj);
 	}

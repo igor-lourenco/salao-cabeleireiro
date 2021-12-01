@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -50,7 +52,7 @@ public class ClienteService {
 	}
 
 	@Transactional()
-	public ClienteDTO insert(ClienteInsertDTO dto) {
+	public ClienteDTO insert(@Valid ClienteInsertDTO dto) {
 		Cliente entity = new Cliente();
 		atualizaCliente(entity, dto);
 		entity.setSenha(senhaEncoder.encode(dto.getSenha()));
@@ -59,7 +61,7 @@ public class ClienteService {
 	}
 
 	@Transactional()
-	public ClienteDTO update(Integer id, ClienteDTO dto) {
+	public ClienteDTO update(@Valid Integer id, ClienteDTO dto) {
 		Cliente entity = repository.getOne(id);
 		try {
 			atualizaCliente(entity, dto);

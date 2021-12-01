@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.Cliente;
 
@@ -13,7 +16,11 @@ public class ClienteDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	private Integer id;
+	
+	@NotBlank(message = "Nome obrigatório")
 	private String nome;
+	
+	@Email(message = "Favor entrar e-mail válido")
 	private String email;
 	
 	private List<AgendamentoFindDTO> agendamentosDTO = new ArrayList<>();

@@ -10,7 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cabeleireiro.dto.AgendamentoDTO;
+import com.cabeleireiro.dto.AgendamentoFindDTO;
 import com.cabeleireiro.dto.ClienteDTO;
 import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.Cliente;
@@ -75,7 +75,7 @@ public class ClienteService {
 		entity.setEmail(dto.getEmail());
 		entity.setSenha(dto.getSenha());
 
-		for (AgendamentoDTO agendaDTO : dto.getAgendamentosDTO()) {
+		for (AgendamentoFindDTO agendaDTO : dto.getAgendamentosDTO()) {
 			Agendamento agenda = agendaRepository.getOne(agendaDTO.getId());
 			entity.getAgendamentos().add(agenda);
 		}

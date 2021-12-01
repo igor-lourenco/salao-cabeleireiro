@@ -2,12 +2,17 @@ package com.cabeleireiro.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -25,6 +30,13 @@ public class Cliente implements Serializable{
 
 	@OneToMany(mappedBy = "cliente")
 	private List<Agendamento> agendamentos = new ArrayList<>();
+	
+	@ManyToMany
+	@JoinTable(name = "tb_cliente_role",
+	joinColumns = @JoinColumn(name = "cliente_id"),
+	inverseJoinColumns = @JoinColumn(name = "role_id")
+	)
+	private Set<Role> roles = new HashSet<>();
 
 	public Cliente() {
 
@@ -71,6 +83,10 @@ public class Cliente implements Serializable{
 
 	public List<Agendamento> getAgendamentos() {
 		return agendamentos;
+	}
+		
+	public Set<Role> getRoles() {
+		return roles;
 	}
 
 	@Override

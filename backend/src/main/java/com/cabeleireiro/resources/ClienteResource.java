@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.cabeleireiro.dto.ClienteDTO;
 import com.cabeleireiro.dto.ClienteInsertDTO;
+import com.cabeleireiro.dto.ClienteUpdateDTO;
 import com.cabeleireiro.services.ClienteService;
 
 @RestController
@@ -45,12 +46,12 @@ public class ClienteResource {
 		return ResponseEntity.created(uri).body(obj);
 	}
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<ClienteDTO> update(@Valid @PathVariable Integer id, @RequestBody ClienteDTO dto){
+	public ResponseEntity<ClienteDTO> update(@PathVariable Integer id, @Valid @RequestBody ClienteUpdateDTO dto){
 		ClienteDTO obj = service.update(id,dto);
 		return ResponseEntity.ok().body(obj);
 	}
 	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<ClienteDTO> update(@PathVariable Integer id){
+	public ResponseEntity<ClienteDTO> delete(@PathVariable Integer id){
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}

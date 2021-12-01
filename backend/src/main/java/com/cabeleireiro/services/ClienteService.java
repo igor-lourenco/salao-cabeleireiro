@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cabeleireiro.dto.AgendamentoFindDTO;
 import com.cabeleireiro.dto.ClienteDTO;
 import com.cabeleireiro.dto.ClienteInsertDTO;
+import com.cabeleireiro.dto.ClienteUpdateDTO;
 import com.cabeleireiro.dto.RoleDTO;
 import com.cabeleireiro.entities.Agendamento;
 import com.cabeleireiro.entities.Cliente;
@@ -52,7 +51,7 @@ public class ClienteService {
 	}
 
 	@Transactional()
-	public ClienteDTO insert(@Valid ClienteInsertDTO dto) {
+	public ClienteDTO insert(ClienteInsertDTO dto) {
 		Cliente entity = new Cliente();
 		atualizaCliente(entity, dto);
 		entity.setSenha(senhaEncoder.encode(dto.getSenha()));
@@ -61,7 +60,7 @@ public class ClienteService {
 	}
 
 	@Transactional()
-	public ClienteDTO update(@Valid Integer id, ClienteDTO dto) {
+	public ClienteDTO update(Integer id, ClienteUpdateDTO dto) {
 		Cliente entity = repository.getOne(id);
 		try {
 			atualizaCliente(entity, dto);

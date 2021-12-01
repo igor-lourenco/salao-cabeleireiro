@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -27,7 +28,7 @@ public class Cliente implements Serializable{
 	private Integer id;
 	private String nome;
 	
-	//@Column(unique = true)
+	@Column(unique = true)
 	private String email;
 	private String senha;
 

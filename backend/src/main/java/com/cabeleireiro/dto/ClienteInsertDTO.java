@@ -2,6 +2,9 @@ package com.cabeleireiro.dto;
 
 import javax.validation.constraints.NotBlank;
 
+import com.cabeleireiro.services.validation.ClienteInsertValid;
+
+@ClienteInsertValid
 public class ClienteInsertDTO extends ClienteDTO{
 	private static final long serialVersionUID = 1L;
 	

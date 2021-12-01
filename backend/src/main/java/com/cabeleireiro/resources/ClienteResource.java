@@ -3,6 +3,8 @@ package com.cabeleireiro.resources;
 import java.net.URI;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,13 +39,13 @@ public class ClienteResource {
 		return ResponseEntity.ok().body(obj);
 	}
 	@PostMapping()
-	public ResponseEntity<ClienteDTO> insert(@RequestBody ClienteInsertDTO dto){
+	public ResponseEntity<ClienteDTO> insert(@Valid @RequestBody ClienteInsertDTO dto){
 		ClienteDTO obj = service.insert(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(obj);
 	}
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<ClienteDTO> update(@PathVariable Integer id, @RequestBody ClienteDTO dto){
+	public ResponseEntity<ClienteDTO> update(@Valid @PathVariable Integer id, @RequestBody ClienteDTO dto){
 		ClienteDTO obj = service.update(id,dto);
 		return ResponseEntity.ok().body(obj);
 	}

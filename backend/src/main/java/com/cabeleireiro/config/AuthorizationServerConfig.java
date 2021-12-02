@@ -67,6 +67,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		endpoints.authenticationManager(authenticationManager) // quem vai autenticar
 		.tokenStore(tokenStore)     // token da aplicação
 		.accessTokenConverter(accessTokenConverter)
-		.tokenEnhancer(chain); 
+		.tokenEnhancer(chain);  // dados do usuario no token
 	}
 }

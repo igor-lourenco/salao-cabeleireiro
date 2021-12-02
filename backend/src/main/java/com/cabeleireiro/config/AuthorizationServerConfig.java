@@ -1,6 +1,7 @@
 package com.cabeleireiro.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +17,13 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @EnableAuthorizationServer //faz o processamento pra ser o AuthorizationServer do oauth
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
+	@Value("${security.oauth2.client.client-id}")
+	private String clienteId;
+	@Value("${security.oauth2.client.client-secret}")
+	private String clienteSecret;
+	@Value("${jwt.duration}")
+	private Integer duracao;
+	
 	@Autowired
 	private BCryptPasswordEncoder senhaEncoder;
 	@Autowired
@@ -34,11 +42,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override // define como que vai ser a autenticação e quais vão ser os dados da aplicação
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory()                      // pro processo ser feito em memória
-		.withClient("cabelo")             // qual dizer qual vai ser o nome da aplicação
-		.secret(senhaEncoder.encode("cabelo123"))   // senha da aplicação
+		.withClient(clienteId)             // qual dizer qual vai ser o nome da aplicação
+		.secret(senhaEncoder.encode(clienteSecret))   // senha da aplicação
 		.scopes("read", "write")                       //se o acesso vai ser de leitura ou escrita ou os dois
 		.authorizedGrantTypes("password")               //grandType que vai no cabeçalho da autenticação
-		.accessTokenValiditySeconds(86400);                //tempo pra expirar o token
+		.accessTokenValiditySeconds(duracao);                //tempo pra expirar o token
 		
 	}
 

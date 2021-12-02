@@ -159,4 +159,14 @@ public class Cliente implements UserDetails, Serializable{
 	public boolean isEnabled() {
 		return true;
 	}
+	
+	// verifica se o usuario tem o role passado como parametro
+	public boolean HasRole(String roleNome) { 
+		for(Role role : roles) {
+			if(role.getAuthority().equals(roleNome)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

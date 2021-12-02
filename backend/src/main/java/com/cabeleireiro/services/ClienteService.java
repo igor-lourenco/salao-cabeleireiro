@@ -40,6 +40,8 @@ public class ClienteService implements UserDetailsService {
 	private RoleRepository roleRepository;
 	@Autowired
 	private BCryptPasswordEncoder senhaEncoder;
+	@Autowired
+	private AuthService authService;
 
 	private static Logger logger = org.slf4j.LoggerFactory.getLogger(ClienteService.class);
 
@@ -62,6 +64,7 @@ public class ClienteService implements UserDetailsService {
 
 	@Transactional(readOnly = true)
 	public ClienteDTO findById(Integer id) {
+		authService.validaClienteOuAdmin(id); // verifica se o usuario é admin
 		Optional<Cliente> entity = repository.findById(id);
 		Cliente obj = entity.orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado -> " + id));
 		return new ClienteDTO(obj, obj.getAgendamentos());

@@ -4,9 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +30,7 @@ import com.cabeleireiro.services.exceptions.DatabaseException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
 
 @Service
-public class ClienteService {
+public class ClienteService implements UserDetailsService {
 
 	@Autowired
 	private ClienteRepository repository;
@@ -36,6 +40,19 @@ public class ClienteService {
 	private RoleRepository roleRepository;
 	@Autowired
 	private BCryptPasswordEncoder senhaEncoder;
+
+	private static Logger logger = org.slf4j.LoggerFactory.getLogger(ClienteService.class);
+
+	@Override // busca o usuário por email
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Cliente cliente = repository.findByEmail(username);
+		if (cliente == null) {
+			logger.error("Usuario não encontrado: " + username);
+			throw new UsernameNotFoundException("E-mail não existe");
+		}
+		logger.info("Usuario encontrado: " + username);
+		return cliente;
+	}
 
 	@Transactional(readOnly = true)
 	public List<ClienteDTO> findAll() {
@@ -90,7 +107,7 @@ public class ClienteService {
 			Role role = roleRepository.getOne(roleDTO.getId());
 			entity.getRoles().add(role);
 		}
-		
+
 		entity.getAgendamentos().clear();
 		for (AgendamentoFindDTO agendaDTO : dto.getAgendamentosDTO()) {
 			Agendamento agenda = agendaRepository.getOne(agendaDTO.getId());

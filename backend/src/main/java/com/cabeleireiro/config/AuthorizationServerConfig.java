@@ -1,0 +1,51 @@
+package com.cabeleireiro.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+
+@Configuration
+@EnableAuthorizationServer //faz o processamento pra ser o AuthorizationServer do oauth
+public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+	@Autowired
+	private BCryptPasswordEncoder senhaEncoder;
+	@Autowired
+	private JwtAccessTokenConverter accessTokenConverter;
+	@Autowired
+	private JwtTokenStore tokenStore;
+	@Autowired
+	private AuthenticationManager authenticationManager;
+
+	
+	@Override 
+	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+		security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+	}
+
+	@Override // define como que vai ser a autenticação e quais vão ser os dados da aplicação
+	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+		clients.inMemory()                      // pro processo ser feito em memória
+		.withClient("cabelo")             // qual dizer qual vai ser o nome da aplicação
+		.secret(senhaEncoder.encode("cabelo123"))   // senha da aplicação
+		.scopes("read", "write")                       //se o acesso vai ser de leitura ou escrita ou os dois
+		.authorizedGrantTypes("password")               //grandType que vai no cabeçalho da autenticação
+		.accessTokenValiditySeconds(86400);                //tempo pra expirar o token
+		
+	}
+
+	@Override  // metódo pra dizer quem vai autorizar e qual vai ser o formato do token
+	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		endpoints.authenticationManager(authenticationManager) // quem vai autenticar
+		.tokenStore(tokenStore)     // token da aplicação
+		.accessTokenConverter(accessTokenConverter); 
+	}
+}

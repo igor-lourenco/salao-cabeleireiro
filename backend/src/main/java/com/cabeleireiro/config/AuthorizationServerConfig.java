@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -39,6 +40,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private  JwtTokenEnhancer jwtTokenEnhancer;
+	@Autowired
+	private  UserDetailsService service;
 
 	
 	@Override 
@@ -52,8 +55,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		.withClient(clienteId)             // qual dizer qual vai ser o nome da aplicação
 		.secret(senhaEncoder.encode(clienteSecret))   // senha da aplicação
 		.scopes("read", "write")                       //se o acesso vai ser de leitura ou escrita ou os dois
-		.authorizedGrantTypes("password")               //grandType que vai no cabeçalho da autenticação
-		.accessTokenValiditySeconds(duracao);                //tempo pra expirar o token
+		.authorizedGrantTypes("password", "refresh_token")               //grandType que vai no cabeçalho da autenticação
+		.accessTokenValiditySeconds(duracao)						//tempo pra expirar o token
+		.refreshTokenValiditySeconds(duracao);                //tempo pra expirar o refresh token
 		
 	}
 
@@ -67,6 +71,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		endpoints.authenticationManager(authenticationManager) // quem vai autenticar
 		.tokenStore(tokenStore)     // token da aplicação
 		.accessTokenConverter(accessTokenConverter)
-		.tokenEnhancer(chain);  // dados do usuario no token
+		.tokenEnhancer(chain)  // dados do usuario no token
+		.userDetailsService(service); //pra pegar o refresh token
 	}
 }

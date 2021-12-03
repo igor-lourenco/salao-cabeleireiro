@@ -25,6 +25,8 @@ public class AuthService {
 		}
 	}
 	
+	//public void enviarNovaSenha();
+	
 	public void validaClienteOuAdmin(Integer clienteId) {	
 		Cliente cliente = autenticado();
 		

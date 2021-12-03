@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cabeleireiro.dto.AgendamentoDTO;
 import com.cabeleireiro.entities.Agendamento;
+import com.cabeleireiro.entities.Cliente;
 import com.cabeleireiro.entities.enums.HorarioEnum;
 import com.cabeleireiro.repositories.AgendamentoRepository;
 import com.cabeleireiro.repositories.ClienteRepository;
@@ -21,6 +22,7 @@ import com.cabeleireiro.repositories.ServicoRepository;
 import com.cabeleireiro.services.exceptions.DatabaseException;
 import com.cabeleireiro.services.exceptions.ReservaNotFoundException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
+import com.cabeleireiro.services.interfaces.EmailService;
 
 @Service
 public class AgendamentoService {
@@ -31,6 +33,10 @@ public class AgendamentoService {
 	private ServicoRepository servicoRepository;
 	@Autowired
 	private ClienteRepository clienteRepository;
+	@Autowired
+	private AuthService authService;
+	@Autowired
+	private EmailService emailService;
 
 	@Transactional(readOnly = true)
 	public List<AgendamentoDTO> findAll() {
@@ -40,10 +46,8 @@ public class AgendamentoService {
 
 	@Transactional(readOnly = true)
 	public AgendamentoDTO findById(Integer id) {
-		Optional<Agendamento> entity = repository.findById(id);
-		Agendamento obj = entity
-				.orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado -> " + id));
-		return new AgendamentoDTO(obj);
+		Agendamento entity = findAgendamento(id);
+		return new AgendamentoDTO(entity);
 	}
 
 	@Transactional()
@@ -51,13 +55,15 @@ public class AgendamentoService {
 		Agendamento entity = new Agendamento();
 		atualizaAgendamento(entity, dto);
 		entity = repository.save(entity);
+		emailService.sendEmail(entity);
 		return new AgendamentoDTO(entity);
 	}
 
 	@Transactional()
 	public AgendamentoDTO update(Integer id, AgendamentoDTO dto) {
 		try {
-			Agendamento entity = repository.getOne(id);
+			Agendamento entity = findAgendamento(id);
+			authService.validaClienteOuAdmin(entity.getCliente().getId());
 			atualizaAgendamento(entity, dto);
 			entity = repository.save(entity);
 			return new AgendamentoDTO(entity);
@@ -65,15 +71,24 @@ public class AgendamentoService {
 			throw new ResourceNotFoundException("Agendamento não foi atualizado -> " + id);
 		}
 	}
-
+	
 	public void delete(Integer id) {
-		try {
+		try {//pega o cliente do agendamento pra excluir somente o dele
+			Agendamento entity = findAgendamento(id);
+			authService.validaClienteOuAdmin(entity.getCliente().getId());
 			repository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
 			throw new ResourceNotFoundException("Agendamento não encontrado -> " + id);
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Violação de integridade no banco");
 		}
+	}
+	
+	public Agendamento  findAgendamento(Integer agendamentoId) {
+		Optional<Agendamento> agendamento = repository.findById(agendamentoId);
+		Agendamento entity = agendamento
+				.orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado -> " + agendamentoId));
+		return entity;
 	}
 
 	public List<AgendamentoDTO> findByData(LocalDate data) {
@@ -82,15 +97,14 @@ public class AgendamentoService {
 	}
 
 	public void atualizaAgendamento(Agendamento entity, AgendamentoDTO dto) {
+		Cliente cliente = authService.autenticado();
 		entity.setHorario(dto.getHorario());
-		verificaHorario(dto); // verifica se já existe um horário reservado
-		entity.setData(dto.getData());
+		verificaHorario(entity, dto); // verifica se já existe um horário reservado
 		entity.setServico(servicoRepository.getOne(dto.getServicoDTO().getId()));
-		entity.setCliente(clienteRepository.getOne(dto.getServicoDTO().getId()));
-
+		entity.setCliente(clienteRepository.getOne(cliente.getId()));
 	}
 
-	public void verificaHorario(AgendamentoDTO dto) {
+	public void verificaHorario(Agendamento entity, AgendamentoDTO dto) {
 		List<Agendamento> agenda = repository.findAll();
 
 		for (Agendamento obj : agenda) {
@@ -98,10 +112,16 @@ public class AgendamentoService {
 			LocalDate localDate2 = dto.getData();
 			HorarioEnum horarioEnum1 = obj.getHorario();
 			HorarioEnum horarioEnum2 = dto.getHorario();
-
-			if (localDate1.equals(localDate2) && horarioEnum1.equals(horarioEnum2)) {
+			
+			try {
+				if (localDate1.equals(localDate2) && horarioEnum1.equals(horarioEnum2) // se o horario for igual
+						&& !entity.getId().equals(obj.getId())) {
+					throw new ReservaNotFoundException("Esse horário já está reservado: " + horarioEnum2.getHora());
+				}
+			} catch (NullPointerException e) {
 				throw new ReservaNotFoundException("Esse horário já está reservado: " + horarioEnum2.getHora());
 			}
+			entity.setData(dto.getData());
 		}
 	}
 }

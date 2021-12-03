@@ -30,6 +30,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	private static final String[] NOVO_CLIENTE = {"/clientes/**"};
 
 	private static final String[] SERVICO = {"/servicos/**"};
+
+	private static final String[] AGENDAMENTO = {"/agendamentos/**"};
 	
 	//private static final String[] GET_ID = {"/clientes/**"};
 
@@ -51,8 +53,11 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		.antMatchers(HttpMethod.GET, PUBLICO2).permitAll()
 		.antMatchers(HttpMethod.POST, NOVO_CLIENTE).permitAll()
 		.antMatchers(HttpMethod.POST, SERVICO).hasAnyRole("ADMIN")
+		.antMatchers(HttpMethod.POST, AGENDAMENTO).hasAnyRole("CLIENTE", "ADMIN")
+		.antMatchers(HttpMethod.PUT, AGENDAMENTO).hasAnyRole("CLIENTE", "ADMIN")
 		.antMatchers(HttpMethod.PUT, SERVICO).hasAnyRole("ADMIN")
 		.antMatchers(HttpMethod.DELETE, SERVICO).hasAnyRole("ADMIN")
+		.antMatchers(HttpMethod.DELETE, "/agendamentos/{id}**").hasAnyRole("ADMIN", "CLIENTE")
 		.antMatchers(HttpMethod.GET, "/clientes/{id}/**").hasAnyRole("CLIENTE", "ADMIN")
 		//.antMatchers(ADMIN).hasRole("ADMIN")
 		.anyRequest().hasRole("ADMIN");

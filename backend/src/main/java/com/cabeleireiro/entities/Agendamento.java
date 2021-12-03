@@ -2,6 +2,7 @@ package com.cabeleireiro.entities;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,7 +22,6 @@ public class Agendamento implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
 	
 	private LocalDate data;
 	
@@ -110,5 +110,23 @@ public class Agendamento implements Serializable{
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		StringBuilder builder = new StringBuilder();
+		builder.append("\nAgendamento:\n");
+		builder.append("Nome: " + cliente.getNome());
+		builder.append("\n");
+		builder.append("Data: ");
+		builder.append(data.format(formatter));
+		builder.append("\nHorário: ");
+		builder.append(horario.getHora());
+		builder.append("\nServiço: ");
+		builder.append(servico.getDescricao());
+		builder.append("\nValor: ");
+		builder.append(servico.getValor());
+		return builder.toString();
 	}
 }

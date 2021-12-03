@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.cabeleireiro.services.exceptions.DatabaseException;
+import com.cabeleireiro.services.exceptions.EmailException;
 import com.cabeleireiro.services.exceptions.ForbiddenException;
 import com.cabeleireiro.services.exceptions.ReservaNotFoundException;
 import com.cabeleireiro.services.exceptions.ResourceNotFoundException;
@@ -53,6 +54,18 @@ public class ResourceExceptionHandler {
 		err.setTimestamp(LocalDateTime.now().format(formatter));
 		err.setStatus(status.value());
 		err.setError("Exceção no banco");
+		err.setMessage(e.getMessage());
+		err.setPath(request.getRequestURI());
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(EmailException.class)
+	public ResponseEntity<StandardError> email(EmailException e, HttpServletRequest request){
+		HttpStatus status = HttpStatus.BAD_REQUEST; //400
+		StandardError err = new StandardError();
+		err.setTimestamp(LocalDateTime.now().format(formatter));
+		err.setStatus(status.value());
+		err.setError("Exceção no envio de e-mail");
 		err.setMessage(e.getMessage());
 		err.setPath(request.getRequestURI());
 		return ResponseEntity.status(status).body(err);

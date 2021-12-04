@@ -33,7 +33,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
 	private static final String[] AGENDAMENTO = {"/agendamentos/**"};
 	
-	//private static final String[] GET_ID = {"/clientes/**"};
+	private static final String[] NOVA_SENHA = {"/auth/forgot/**"};
 
 	@Override // configura o tokenStore, pra decodificar o token e verificar se o token é válido
 	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
@@ -50,6 +50,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		
 		http.authorizeRequests()
 		.antMatchers(PUBLICO1).permitAll()
+		.antMatchers(NOVA_SENHA).permitAll()
 		.antMatchers(HttpMethod.GET, PUBLICO2).permitAll()
 		.antMatchers(HttpMethod.POST, NOVO_CLIENTE).permitAll()
 		.antMatchers(HttpMethod.POST, SERVICO).hasAnyRole("ADMIN")
@@ -59,7 +60,6 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 		.antMatchers(HttpMethod.DELETE, SERVICO).hasAnyRole("ADMIN")
 		.antMatchers(HttpMethod.DELETE, "/agendamentos/{id}**").hasAnyRole("ADMIN", "CLIENTE")
 		.antMatchers(HttpMethod.GET, "/clientes/{id}/**").hasAnyRole("CLIENTE", "ADMIN")
-		//.antMatchers(ADMIN).hasRole("ADMIN")
 		.anyRequest().hasRole("ADMIN");
 	}
 }

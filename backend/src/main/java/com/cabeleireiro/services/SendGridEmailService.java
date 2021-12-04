@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.cabeleireiro.dto.EmailDTO;
 import com.cabeleireiro.entities.Agendamento;
+import com.cabeleireiro.entities.Cliente;
 import com.cabeleireiro.services.exceptions.EmailException;
 import com.cabeleireiro.services.interfaces.EmailService;
 import com.sendgrid.Method;
@@ -38,15 +39,13 @@ public class SendGridEmailService implements EmailService {
 		//dto.setReplyTo(remetente);
 		Email from = new Email(dto.getFromEmail(), dto.getFromName());// remetente
 		
-		dto.setTo("igor.lourencosantos@gmail.com");
+		//dto.setTo("igor.lourencosantos@gmail.com");
 		Email to = new Email(dto.getTo());// destinatário
 		
-		//Content content = new Content(dto.getContentType(), dto.getBody());// conteudo do email
-
 		dto.setSubject("Agendamento confirmado! Código: " + entity.getId());
 		dto.setBody(entity.toString());
 		dto.setContentType("text/plain");
-		Content content = new Content(dto.getContentType(), dto.getSubject() + dto.getBody());
+		Content content = new Content(dto.getContentType(), dto.getSubject() + dto.getBody());  //conteudo do email
 		
 		// getSubject -> assunto do email
 		Mail mail = new Mail(from, dto.getSubject(), to, content);
@@ -57,9 +56,8 @@ public class SendGridEmailService implements EmailService {
 			request.setMethod(Method.POST);//método do envio do email
 			request.setEndpoint("mail/send");    //qual api deles o sendgrid vai chamar
 			request.setBody(mail.build()); //qual o corpo que o email vai enviar			
-			
-			log.info("Enviando email para: " + dto.getTo());
-			
+		
+			log.info("Enviando email para: " + dto.getTo());	
 			//pra receber a resposta do sendgrid, se enviou ou se deu erro no envio
 			Response response = sendGrid.api(request);  
 			
@@ -73,4 +71,48 @@ public class SendGridEmailService implements EmailService {
 			throw new EmailException(e.getMessage());
 		}
 	}
+
+	@Override
+	public void enviarNovaSenhaEmail(Cliente cliente, String novaSenha) {
+		EmailDTO dto = new EmailDTO();
+		dto.setFromEmail(remetente);
+		dto.setFromName("Agendamento | Cabeleireiro");
+		//dto.setReplyTo(remetente);
+		
+		Email from = new Email(dto.getFromEmail(), dto.getFromName());// remetente
+		
+		cliente.setEmail(cliente.getEmail());
+		Email to = new Email(cliente.getEmail());// destinatário
+		
+		dto.setSubject("Solicitação de nova senha\n");
+		dto.setBody("Nova senha: " + novaSenha);
+		dto.setContentType("text/plain");
+		Content content = new Content(dto.getContentType(), dto.getSubject() + dto.getBody());  //conteudo do email
+		
+		// getSubject -> assunto do email
+		Mail mail = new Mail(from, dto.getSubject(), to, content);
+
+		Request request = new Request();// pra enviar o email
+
+		try {
+			request.setMethod(Method.POST);//método do envio do email
+			request.setEndpoint("mail/send");    //qual api deles o sendgrid vai chamar
+			request.setBody(mail.build()); //qual o corpo que o email vai enviar			
+		
+			log.info("Enviando email para: " + dto.getTo());	
+			//pra receber a resposta do sendgrid, se enviou ou se deu erro no envio
+			Response response = sendGrid.api(request);  
+			
+			if(response.getStatusCode() >= 400 && response.getStatusCode() <= 500) {
+				log.error("Erro ao enviar o email: " + response.getBody());
+				throw new EmailException(response.getBody());
+			}
+				log.info("Email enviado: " + response.getStatusCode());
+				
+		} catch (IOException e) {
+			throw new EmailException(e.getMessage());
+		}
+	}
+		
+	
 }
